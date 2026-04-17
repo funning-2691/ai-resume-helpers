@@ -1,21 +1,24 @@
+// app/api/history/[id]/route.ts
 import { NextResponse } from 'next/server';
 import { getResumeRecordById, deleteResumeRecord } from '@/lib/db-sqlite';
 
+// ✅ Next.js 15+ 的写法：params 是 Promise
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id);
+    const { id } = await params;  // ✅ 需要 await
+    const idNum = parseInt(id);
     
-    if (isNaN(id)) {
+    if (isNaN(idNum)) {
       return NextResponse.json(
         { error: '无效的ID' },
         { status: 400 }
       );
     }
     
-    const result = await getResumeRecordById(id);
+    const result = await getResumeRecordById(idNum);
     
     if (result.success) {
       return NextResponse.json({
@@ -37,21 +40,23 @@ export async function GET(
   }
 }
 
+// ✅ DELETE 也要同样修改
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id);
+    const { id } = await params;
+    const idNum = parseInt(id);
     
-    if (isNaN(id)) {
+    if (isNaN(idNum)) {
       return NextResponse.json(
         { error: '无效的ID' },
         { status: 400 }
       );
     }
     
-    const result = await deleteResumeRecord(id);
+    const result = await deleteResumeRecord(idNum);
     
     if (result.success) {
       return NextResponse.json({
