@@ -1,36 +1,266 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📄 AI简历助手 (AI Resume Helper)
 
-## Getting Started
+[![Vercel](https://img.shields.io/badge/deployed%20on-Vercel-black?style=flat&logo=vercel)](https://ai-resume-helpers.vercel.app)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat&logo=next.js)](https://nextjs.org/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-First, run the development server:
+> 🚀 一个智能的AI简历优化工具，帮助你精准匹配心仪岗位，让简历脱颖而出。
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## ✨ 项目简介
+
+**AI简历助手** 专为求职者打造，利用AI大语言模型，智能分析你的简历与目标岗位之间的差距，并提供**针对性优化建议**。它不仅是内容优化器，更是一个**简历-岗位匹配度评估专家**，帮助你快速定位简历短板，提升求职成功率。
+
+> **项目特点**：全栈自研 | 零门槛使用 | 保护数据隐私 (本地优先) | 开箱即用
+
+## 🎯 核心特性
+
+| 功能 | 描述 |
+| :--- | :--- |
+| ✍️ **AI智能优化** | 输入简历内容与岗位描述，AI将重写你的项目经历、技能描述，使其更贴合岗位需求。 |
+| 📊 **匹配度评估** | 基于多维度分析，给出你与目标岗位的匹配度分数，并指出关键提升点。 |
+| 🕒 **历史记录** | 自动保存每一次优化结果，方便回溯、对比不同版本的简历。 |
+| 📁 **一键导出** | 支持将优化后的内容**一键复制**，或下载为 **TXT / Word** 格式，轻松保存到本地。 |
+| 🌐 **云端部署** | 已部署在 **Vercel**，随时随地通过浏览器访问使用。 |
+| 💾 **本地数据库** | 使用 **SQLite** 存储历史记录，数据可控，无需复杂配置。 |
+
+## 🖼️ 效果预览
+### 职位描述
+【岗位名称】前端开发工程师
+
+【岗位职责】
+1. 负责公司核心产品的前端架构设计和技术选型
+2. 参与产品需求评审，独立完成前端模块的开发与维护
+3. 与后端工程师配合，完成 API 接口对接和性能优化
+4. 持续优化前端性能，提升页面加载速度和用户体验
+5. 编写可复用的组件和前端代码规范文档
+
+【任职要求】
+1. 本科及以上学历，计算机相关专业，3年以上前端开发经验
+2. 熟练掌握 HTML5、CSS3、JavaScript (ES6+)
+3. 精通 React 或 Vue 框架，至少有一个完整项目经验
+4. 熟悉 Webpack/Vite 等构建工具，了解前端工程化
+5. 了解 HTTP 协议、浏览器渲染原理，有性能优化经验
+6. 具备良好的代码习惯和团队协作能力
+7. 有移动端 H5、小程序开发经验者优先
+
+【加分项】
+- 有 Node.js 开发经验
+- 熟悉 TypeScript
+- 有开源项目或技术博客
+
+
+### 个人简历
+【个人信息】
+姓名：张三
+工作年限：3年
+联系电话：138****1234
+邮箱：zhangsan@email.com
+
+【教育背景】
+某某大学 计算机科学与技术 本科 2017-2021
+
+【工作经历】
+公司A 前端开发工程师 2022.01-至今
+- 负责公司官网的开发
+- 写了几个页面
+- 配合后端完成接口调用
+- 修复了一些 bug
+
+公司B 前端开发实习生 2021.07-2021.12
+- 协助开发后台管理系统
+- 用 Vue 做了一些功能
+- 学习前端技术
+
+【项目经验】
+项目A：企业官网
+- 使用 HTML/CSS/JS 开发
+- 实现响应式布局
+- 完成页面展示功能
+
+项目B：后台管理系统
+- 使用 Vue3 + Element Plus 开发
+- 实现用户管理、订单管理模块
+- 调用后端 API 展示数据
+
+【专业技能】
+- 熟悉 HTML、CSS、JavaScript
+- 了解 Vue 框架
+- 熟悉 Git 基本操作
+- 会用 Webpack
+
+【自我评价】
+工作认真负责，学习能力强，团队协作能力好
+
+### 优化结果
+
+
+【个人信息】
+姓名：张三
+工作年限：3年
+联系电话：138****1234
+邮箱：zhangsan@email.com
+
+【教育背景】
+某某大学 计算机科学与技术 本科 2017-2021
+
+【工作经历】
+公司A 前端开发工程师 2022.01-至今
+- 主导企业官网前端架构设计，采用HTML/CSS/JS实现响应式布局，适配多终端访问需求，完成核心页面开发
+- 独立完成前端模块开发与维护，优化页面加载速度，提升用户体验
+- 与后端工程师协作完成API接口对接，通过代码规范和性能优化提升系统稳定性
+- 编写可复用组件和前端代码规范文档，推动团队开发效率提升
+
+公司B 前端开发实习生 2021.07-2021.12
+- 核心参与后台管理系统开发，基于Vue3框架实现用户管理、订单管理模块
+- 与后端团队协作完成API接口对接，确保数据实时展示
+- 学习并实践前端工程化流程，掌握Webpack构建工具使用
+
+【项目经验】
+项目A：企业官网
+- 使用HTML/CSS/JS开发，实现响应式布局，适配多终端访问需求
+- 完成核心页面开发，提升用户浏览效率
+- 优化页面加载速度，提升用户体验
+
+项目B：后台管理系统
+- 基于Vue3 + Element Plus开发，实现用户管理、订单管理模块
+- 与后端团队协作完成API接口对接，确保数据实时展示
+- 通过模块化设计提升系统可维护性，支持后续功能扩展
+
+【专业技能】
+- 精通HTML5、CSS3、JavaScript（ES6+）及Vue3框架，具备扎实的前端开发经验
+- 熟悉Webpack构建工具，了解前端工程化实践
+- 掌握TypeScript基础语法，具备良好的代码规范意识
+- 熟悉HTTP协议和浏览器渲染原理，有性能优化经验
+- 具备跨部门协作能力，能够有效沟通产品需求并推动技术实现
+
+【自我评价】
+具备良好的代码习惯和团队协作能力，能够高效沟通并推动项目进展，持续学习新技术以提升产品开发效率
+
+
+![[Pasted image 20260423171500.png]]
+![[Pasted image 20260423171530.png]]
+
+
+## 📦 快速开始
+
+### 在线体验 (无需安装)
+
+👉 [点击访问 Vercel 在线版](https://ai-resume-helpers.vercel.app)  
+> **注意**：由于网络原因，国内访问可能受限。如需稳定使用，建议本地部署。
+
+
+
+### 本地运行
+
+1. **克隆项目**
+   ```bash
+   git clone https://github.com/funning-2691/ai-resume-helpers.git
+   cd ai-resume-helpers
+   ```
+
+2. **安装依赖**
+   ```bash
+   npm install
+   # 或使用 yarn / pnpm / bun
+   ```
+
+3. **配置AI接口**
+   - 本项目默认调用 OpenAI 兼容的 API。你需要：
+     - 在项目根目录创建 `.env.local` 文件
+     - 添加你的 API 密钥：
+       ```env
+       SILICONFLOW_API_KEY=你自己的密钥
+       ```
+
+4. **初始化数据库**
+   ```bash
+   # 项目首次运行时会自动创建 SQLite 数据库文件 resume_history.db
+   # 无需手动操作
+   ```
+
+5. **启动开发服务器**
+   ```bash
+   npm run dev
+   ```
+   打开浏览器访问 [http://localhost:3000](http://localhost:3000) 即可开始使用。
+
+> 💡 **提示**：如果你想更换AI模型（如使用本地 Ollama 或国内大模型），只需修改 `lib/ai.js` 中的接口配置即可。
+
+## 🧑‍💻 使用示例
+
+### 场景：优化一段项目经历
+
+**原始简历**  
+> 负责公司后台管理系统开发，维护多个模块，修复bug。
+
+**岗位要求**  
+> 熟悉前后端分离架构，具备高并发系统优化经验，能独立负责模块设计。
+
+**点击“AI优化”后，可能得到**  
+> 独立负责**后台管理系统**的用户权限模块与数据看板设计，基于 **Spring Boot + Vue** 实现前后端分离。通过**索引优化和缓存策略**，将列表查询接口响应时间从 800ms 降低至 120ms。累计修复 30+ 个线上缺陷，系统稳定性提升至 99.9%。
+
+### 匹配度评估输出示例
+
+```
+匹配度得分：68/100
+
+📌 强项：
+- 技术栈匹配 (Spring Boot, Vue)
+- 有模块设计经验
+
+📌 待改进：
+- 缺少“高并发”“系统优化”的具体案例
+- 建议补充：峰值 QPS、压测数据、优化前后的性能对比
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🤝 贡献指南
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+我们非常欢迎你为 **AI简历助手** 添砖加瓦！无论是修复bug、改进UI、增加新功能，还是完善文档，都感激不尽。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 如何贡献？
 
-## Learn More
+1. **Fork 本仓库** → 点击 GitHub 页面右上角的 “Fork” 按钮。
+2. **克隆你的 fork** → `git clone https://github.com/你的用户名/ai-resume-helpers.git`
+3. **创建新分支** → `git checkout -b feature/你的功能名称`
+4. **提交修改** → `git commit -m 'feat: 添加xxx功能'`
+5. **推送分支** → `git push origin feature/你的功能名称`
+6. **发起 Pull Request (PR)** → 回到本仓库，点击 “New Pull Request”。
 
-To learn more about Next.js, take a look at the following resources:
+### 你可以贡献的方向 (参考项目当前问题)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- 🎨 **排版优化**：支持富文本或 Markdown 格式的简历渲染与编辑。
+- 📄 **PDF 导出**：增加下载为 PDF 格式的功能。
+- 🧠 **评估维度细化**：为匹配度评估定义更科学的维度 (如：技能匹配、经验匹配、教育背景、证书等)。
+- 🌍 **国内可用性**：增加对国内常用大模型 (如通义千问、智谱、文心一言) 的示例配置。
+- 🧪 **单元测试**：为核心逻辑添加测试用例。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 行为准则
 
-## Deploy on Vercel
+请保持友善、尊重，并遵循 [贡献者公约](https://www.contributor-covenant.org/zh/version/2/0/code_of_conduct/)。所有贡献者都将被列入致谢名单。
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📜 开源协议
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+本项目采用 **MIT 协议**，你可以自由使用、修改、甚至商业化，但需保留原始版权声明。详见 [LICENSE](LICENSE) 文件。
+
+## 📞 联系与支持
+
+- 项目维护者：**funning-2691**
+- GitHub Issue：[提交问题或建议](https://github.com/funning-2691/ai-resume-helpers/issues)
+- 项目主页：[GitHub 仓库](https://github.com/funning-2691/ai-resume-helpers)
+
+如果这个项目对你有所帮助，欢迎 ⭐️ Star 支持一下～
+
+---
+
+## 🚧 项目路线图
+
+- [x] AI 内容优化 & 匹配度评估
+- [x] 历史记录 & TXT/Word 导出
+- [ ] **排版可视化编辑** (富文本编辑器)
+- [ ] **PDF 导出功能**
+- [ ] **多维度岗位匹配算法** (技能、经验、教育、证书等权重体系)
+- [ ] **多语言支持** (中/英)
+- [ ] **一键导入现有简历文件** (PDF/DOCX 解析)
+
+*你的贡献可以让这些功能更快实现！*
