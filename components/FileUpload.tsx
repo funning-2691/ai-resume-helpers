@@ -1,26 +1,39 @@
 import { useState, useRef } from 'react';
 
+// 组件属性说明
 interface FileUploadProps {
+  // 当文件解析出文本内容时调用，传递解析后的字符串
   onFileContent: (content: string) => void;
+  // 上传控件的文字标签（当前未在 UI 中使用，但保留以备扩展）
   label?: string;
+  // 允许外部传入额外的 className，用于布局/样式定制
   className?: string;
 }
 
+/**
+ * FileUpload 组件
+ * - 支持点击选择或拖拽文件
+ * - 将文件以 FormData POST 到 `/api/parse-file`，期望返回 JSON: { text: string }
+ * - 当前只支持 Word（.doc/.docx）和 TXT，PDF 被临时禁用（在前端提示）
+ */
 export default function FileUpload({ onFileContent, label = '上传文件', className = '' }: FileUploadProps) {
-  const [uploading, setUploading] = useState(false);
-  const [fileName, setFileName] = useState<string>('');
-  const [error, setError] = useState<string>('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false); // 是否正在上传/解析
+  const [fileName, setFileName] = useState<string>(''); // 当前文件名（用于展示）
+  const [error, setError] = useState<string>(''); // 错误消息
+  const fileInputRef = useRef<HTMLInputElement>(null); // 用于重置文件输入
 
+  // 处理通过文件选择器上传的文件
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file) return; // 没有文件时直接返回
 
+    // 根据扩展名判断类型（简单判断，不依赖MIME）
     const fileType = file.name.split('.').pop()?.toLowerCase();
     
-    // 暂时禁用 PDF
+    // 暂时禁用 PDF：前端提示用户将 PDF 转换为 Word 或复制粘贴内容
     if (fileType === 'pdf') {
       setError('暂时只支持 Word 和 TXT 格式，请先将 PDF 转换为 Word 或直接复制内容粘贴');
+      // 重置文件输入，避免用户无法再次选择相同文件
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -35,30 +48,37 @@ export default function FileUpload({ onFileContent, label = '上传文件', clas
       const formData = new FormData();
       formData.append('file', file);
 
+      // 将文件发送到后端解析接口
       const response = await fetch('/api/parse-file', {
         method: 'POST',
         body: formData,
       });
 
+      // 这里先以文本方式读取响应以便更好地诊断非 JSON 响应
       const responseText = await response.text();
       console.log('服务器响应:', responseText);
 
+      // 尝试解析 JSON
       let data;
       try {
         data = JSON.parse(responseText);
       } catch (parseError) {
         console.error('JSON解析失败:', parseError);
+        // 抛出更明确的错误，包含服务器返回的前100字符以便调试
         throw new Error('服务器返回格式错误: ' + responseText.substring(0, 100));
       }
 
+      // 非 2xx 响应时，从返回的 data 中提取错误信息
       if (!response.ok) {
         throw new Error(data.error || '解析失败');
       }
 
+      // 校验后端必须返回的字段
       if (!data.text) {
         throw new Error('解析结果为空');
       }
 
+      // 成功：将解析出的文本通过回调传出
       onFileContent(data.text);
       
     } catch (err) {
@@ -66,17 +86,20 @@ export default function FileUpload({ onFileContent, label = '上传文件', clas
       setError(err instanceof Error ? err.message : '文件解析失败');
     } finally {
       setUploading(false);
+      // 始终重置文件输入，允许用户再次选择相同文件
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
     }
   };
 
+  // 拖拽时阻止默认行为以允许 drop 事件触发
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
   };
 
+  // 处理拖拽放下的文件（逻辑与选择上传类似，保持单文件处理）
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -86,7 +109,7 @@ export default function FileUpload({ onFileContent, label = '上传文件', clas
 
     const fileType = file.name.split('.').pop()?.toLowerCase();
     
-    // 暂时禁用 PDF
+    // 同样在拖拽场景中禁止 PDF
     if (fileType === 'pdf') {
       setError('暂时只支持 Word 和 TXT 格式，请先将 PDF 转换为 Word 或直接复制内容粘贴');
       return;
@@ -150,7 +173,7 @@ export default function FileUpload({ onFileContent, label = '上传文件', clas
         <input
           ref={fileInputRef}
           type="file"
-          accept=".txt,.doc,.docx"  // 去掉 .pdf
+          accept=".txt,.doc,.docx"  // 去掉 .pdf，前端控件限制上传类型
           onChange={handleFileUpload}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           disabled={uploading}
