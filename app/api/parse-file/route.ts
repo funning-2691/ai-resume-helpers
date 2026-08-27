@@ -1,5 +1,6 @@
 // app/api/parse-file/route.ts
 import { NextResponse } from 'next/server';
+import mammoth from 'mammoth';
 
 export async function POST(request: Request) {
   try {
@@ -31,7 +32,6 @@ export async function POST(request: Request) {
       case 'doc':
       case 'docx': {
         try {
-          const mammoth = require('mammoth');
           const result = await mammoth.extractRawText({ buffer });
           text = result.value;
         } catch (wordError) {

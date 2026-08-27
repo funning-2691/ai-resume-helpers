@@ -2,10 +2,11 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { marked } from 'marked';
 import FileUpload from '@/components/FileUpload';
 import DownloadButton from '@/components/DownloadButton';
+import SafeMarkdown from '@/components/SafeMarkdown';
 import Link from 'next/link';
+import { saveToLocalHistory } from '@/lib/localHistory';
 
 export default function Home() {
   const [jdText, setJdText] = useState('');
@@ -14,6 +15,8 @@ export default function Home() {
   const [copySuccess, setCopySuccess] = useState('');
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [currentMatchRate, setCurrentMatchRate] = useState(0);
+  const [keywordCount, setKeywordCount] = useState(0);
+  const [historySaveFailed, setHistorySaveFailed] = useState(false);
 
   // 加载保存的数据
   useEffect(() => {
@@ -39,13 +42,24 @@ export default function Home() {
     localStorage.setItem('optimizedText', optimizedText);
   }, [optimizedText]);
 
+  // 生成本地历史标题：取JD第一个非空行并截取18字，取不到用"未命名岗位"
+  const buildLocalTitle = (jd: string): string => {
+    if (!jd) return '未命名岗位';
+    const firstLine = jd
+      .split('\n')
+      .map((line) => line.trim())
+      .find((line) => line.length > 0);
+    if (!firstLine) return '未命名岗位';
+    return firstLine.length > 18 ? firstLine.slice(0, 18) + '...' : firstLine;
+  };
+
   // 复制功能
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(optimizedText || '暂无优化结果');
       setCopySuccess('复制成功！');
       setTimeout(() => setCopySuccess(''), 2000);
-    } catch (err) {
+    } catch {
       setCopySuccess('复制失败');
     }
   };
@@ -59,6 +73,7 @@ export default function Home() {
     setIsOptimizing(true);
     setOptimizedText('AI正在优化中，请稍候...');
     setCurrentMatchRate(0);
+    setKeywordCount(0);
     
     try {
       // 获取高级选项的值
@@ -89,10 +104,23 @@ export default function Home() {
         throw new Error(data.error || '请求失败');
       }
 
-      setOptimizedText(data.optimized || data.result || '优化失败，请重试');
+      const finalText = data.optimized || data.result || '优化失败，请重试';
+      setOptimizedText(finalText);
       setCurrentMatchRate(data.matchRate || 0);
+      setKeywordCount(data.keywordCount || 0);
+
+      // API 成功后保存本地历史（仅当前浏览器）
+      const saveResult = saveToLocalHistory({
+        title: buildLocalTitle(jdText),
+        matchScore: data.matchRate || 0,
+        keywordCount: data.keywordCount || 0,
+        optimizedResume: finalText,
+      });
+
+      setHistorySaveFailed(!saveResult.success);
     } catch (error) {
       console.error('优化失败:', error);
+      setHistorySaveFailed(false);
       setOptimizedText('优化失败，请稍后重试。错误信息：' + (error as Error).message);
       setCurrentMatchRate(0);
     } finally {
@@ -235,38 +263,52 @@ export default function Home() {
             </div>
             
             <div className="flex-1 overflow-y-auto p-6">
-              {/* 匹配度指示器 - 使用后端返回的匹配度 */}
+              {/* 岗位关键词覆盖率指示器 - 基于原始简历计算 */}
               <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-slate-600">职位匹配度</span>
+                  <span className="text-sm font-medium text-slate-600">岗位关键词覆盖率</span>
                   <span className="text-lg font-semibold text-blue-600">
-                    {currentMatchRate}%
+                    {keywordCount > 0 ? `${currentMatchRate}%` : '暂无可计算关键词'}
                   </span>
                 </div>
-                <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-blue-600 to-cyan-500 rounded-full transition-all duration-500"
-                    style={{ width: `${currentMatchRate}%` }}
-                  ></div>
-                </div>
+                {keywordCount > 0 ? (
+                  <>
+                    <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-blue-600 to-cyan-500 rounded-full transition-all duration-500"
+                        style={{ width: `${currentMatchRate}%` }}
+                      ></div>
+                    </div>
+                    <p className="mt-2 text-xs text-slate-500 leading-relaxed">
+                      仅反映岗位关键词在简历中的覆盖情况，不代表实际胜任程度或面试概率。
+                    </p>
+                  </>
+                ) : (
+                  <p className="mt-2 text-xs text-slate-500 leading-relaxed">
+                    未从岗位描述中识别到可计算的关键词，无法计算覆盖率。
+                  </p>
+                )}
               </div>
+
+              {historySaveFailed && (
+                <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 text-yellow-700 rounded-lg text-sm">
+                  结果已生成，但历史记录保存失败
+                </div>
+              )}
 
               {/* 优化后的简历内容 */}
               <div className="prose prose-sm max-w-none">
                 {optimizedText ? (
-                  <div 
-                    className="bg-white rounded-lg p-4 prose prose-slate max-w-none"
-                    dangerouslySetInnerHTML={{ 
-                      __html: marked(optimizedText, {
-                        breaks: true,
-                        gfm: true
-                      }) 
-                    }}
-                  />
+                  <div className="bg-white rounded-lg p-4 prose prose-slate max-w-none">
+                    <div className="mb-3 p-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-lg text-xs leading-relaxed">
+                      AI 生成结果仅供参考，请人工核对后再投递使用。
+                    </div>
+                    <SafeMarkdown text={optimizedText} />
+                  </div>
                 ) : (
                   <div className="bg-slate-50 rounded-lg p-8 text-center">
                     <p className="text-slate-400">
-                      在左侧输入JD和简历，点击"开始优化"生成结果
+                      {'在左侧输入JD和简历，点击"开始优化"生成结果'}
                     </p>
                   </div>
                 )}
