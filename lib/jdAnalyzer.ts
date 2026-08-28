@@ -55,7 +55,12 @@ function extractKeywords(jd: string): string[] {
   ];
   
   const jdLower = jd.toLowerCase();
-  return allKeywords.filter(keyword => jdLower.includes(keyword.toLowerCase()));
+  // 去重后保留 JD 中实际出现的关键词
+  return Array.from(
+    new Set(
+      allKeywords.filter((keyword) => jdLower.includes(keyword.toLowerCase()))
+    )
+  );
 }
 
 // 提取要求列表
@@ -77,9 +82,9 @@ function extractRequirements(jd: string): string[] {
   return requirements.slice(0, 8);
 }
 
-// 计算匹配度
+// 计算岗位关键词覆盖率：真实反映 0-100%，不加人为下限或上限
 export function calculateMatchRate(resume: string, keywords: string[]): number {
-  if (!resume || keywords.length === 0) return 50;
+  if (!resume || keywords.length === 0) return 0;
   
   const resumeLower = resume.toLowerCase();
   let matchCount = 0;
@@ -90,6 +95,6 @@ export function calculateMatchRate(resume: string, keywords: string[]): number {
     }
   });
   
-  const rate = 50 + Math.min(45, Math.floor((matchCount / Math.max(1, keywords.length)) * 45));
-  return Math.min(95, Math.max(40, rate));
+  // 覆盖率 = 命中关键词数 / JD关键词总数，真实映射到 0-100
+  return Math.floor((matchCount / keywords.length) * 100);
 }

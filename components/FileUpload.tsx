@@ -17,6 +17,7 @@ interface FileUploadProps {
  * - 当前只支持 Word（.doc/.docx）和 TXT，PDF 被临时禁用（在前端提示）
  */
 export default function FileUpload({ onFileContent, label = '上传文件', className = '' }: FileUploadProps) {
+  void label; // label 保留用于未来的语义化扩展
   const [uploading, setUploading] = useState(false); // 是否正在上传/解析
   const [fileName, setFileName] = useState<string>(''); // 当前文件名（用于展示）
   const [error, setError] = useState<string>(''); // 错误消息
